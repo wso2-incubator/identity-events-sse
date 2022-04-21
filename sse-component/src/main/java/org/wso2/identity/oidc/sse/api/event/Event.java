@@ -51,8 +51,6 @@ public class Event {
         return subject;
     }
 
-    //TODO remove unused methods
-
     /**
      * Set subject name
      *

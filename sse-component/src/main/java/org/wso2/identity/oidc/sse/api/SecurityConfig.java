@@ -68,7 +68,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                         .and().csrf().disable().authorizeRequests().antMatchers(Constants.Path.EVENT).permitAll();
             } catch (Exception e) {
-                //TODO add error logs
                 log.error(e.toString());
             }
         }).oauth2ResourceServer(oauth2 -> oauth2.opaqueToken(token -> token.introspectionUri(this.introspectionUri).introspectionClientCredentials(this.clientId, this.clientSecret)));

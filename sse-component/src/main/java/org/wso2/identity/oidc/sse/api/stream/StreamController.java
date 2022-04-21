@@ -74,7 +74,6 @@ public class StreamController {
     @ApiOperation(value = "", notes = "Retrieve current stream configuration")
     public ResponseEntity<?> getConfiguration(@RequestHeader(value = AUTHORIZATION) String accessToken) {
 
-        //TODO do validation...
         if (accessToken.isEmpty()) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
