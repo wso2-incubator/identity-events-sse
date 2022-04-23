@@ -126,4 +126,9 @@ curl --location --request POST 'http://localhost:8080/event' \
     "token":"exampleToken"
 }'
 ```
+## Enable Spring Boot debug logging
+Add following line to the `resources/application.properties` 
 
+```
+debug=true
+```

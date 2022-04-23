@@ -18,6 +18,9 @@
 
 package org.wso2.identity.oidc.sse.event.handler;
 
+/**
+ * Contains the constants related to OIDC sse
+ */
 public class OIDCSSEConstants {
 
     public static final String TOKEN = "token";

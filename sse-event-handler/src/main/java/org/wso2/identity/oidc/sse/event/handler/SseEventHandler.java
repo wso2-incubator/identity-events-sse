@@ -24,14 +24,12 @@ import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONObject;
 import org.wso2.carbon.identity.event.IdentityEventConstants;
-import org.wso2.carbon.identity.event.IdentityEventException;
 import org.wso2.carbon.identity.event.event.Event;
 import org.wso2.carbon.identity.event.handler.AbstractEventHandler;
 import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
@@ -52,7 +50,7 @@ public class SseEventHandler extends AbstractEventHandler {
     private static Log LOG = LogFactory.getLog(SseEventHandler.class);
 
     @Override
-    public void handleEvent(Event event) throws IdentityEventException {
+    public void handleEvent(Event event) {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Custom event handler received events successfully.");
@@ -62,34 +60,56 @@ public class SseEventHandler extends AbstractEventHandler {
             Map<String, Object> eventProperties = event.getEventProperties();
             String userName = (String) eventProperties.get(IdentityEventConstants.EventProperty.USER_NAME);
 
-            //TODO check userNAme null use StringUtils.isEmpty if it is empty throw exception and token ,url
-
             if (StringUtils.isEmpty(userName)) {
-
-            }
-            JWTClaimsSet claimsSet =
-                    new JWTClaimsSet.Builder().issuer(userName).audience(OIDCSSEConstants.AUDIENCE).subject(OIDCSSEConstants.TENANT_ID).build();
-
-            try {
-                String token = OAuth2Util.signJWTWithRSA(claimsSet, JWSAlgorithm.RS256,
-                        MultitenantConstants.SUPER_TENANT_DOMAIN_NAME).serialize();
-
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(token);
+                try {
+                    throw new OIDCSSEServerException("Username not available");
+                } catch (OIDCSSEServerException e) {
+                    e.printStackTrace();
                 }
+            }
+            JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().issuer(userName).audience(OIDCSSEConstants.AUDIENCE).
+                            subject(OIDCSSEConstants.TENANT_ID).build();
 
-                String url = this.configs.getModuleProperties().getProperty(OIDCSSEConstants.URL);
-                sendNotification(url, token, userName, event.getEventName());
+            String token = null;
+            try {
+                token = OAuth2Util.signJWTWithRSA(claimsSet, JWSAlgorithm.RS256,
+                        MultitenantConstants.SUPER_TENANT_DOMAIN_NAME).serialize();
             } catch (IdentityOAuth2Exception e) {
-                //TODO add debug logs and throw the exceptions
+                try {
+                    throw new OIDCSSEServerException("Error while generating token");
+                } catch (OIDCSSEServerException ex) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Error while generating token");
+                    }
+                }
+            }
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(token);
+            }
+
+            String url = this.configs.getModuleProperties().getProperty(OIDCSSEConstants.URL);
+
+            if (StringUtils.isEmpty(url)) {
+                try {
+                    throw new OIDCSSEServerException("Url not available");
+                } catch (OIDCSSEServerException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                sendNotification(url, token, userName, event.getEventName());
+            } catch (OIDCSSEServerException | OIDCSSEClientException e) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug(e.toString());
+                    LOG.debug("error while sending notification for the URL: " + url + "triggering event:"
+                            + event.getEventName());
                 }
             }
         }
     }
 
-    private void sendNotification(String url, String token, String userName, String eventName) {
+    private void sendNotification(String url, String token, String userName, String eventName) throws
+            OIDCSSEClientException, OIDCSSEServerException {
 
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost httpPost = new HttpPost(url);
@@ -101,31 +121,24 @@ public class SseEventHandler extends AbstractEventHandler {
 
         String json = jsonObject.toString();
 
-        //TODO throw server exception
         StringEntity se = null;
         try {
             se = new StringEntity(json);
-            throw new OIDCSSEServerException();
-        } catch (OIDCSSEServerException e) {
-
         } catch (UnsupportedEncodingException e) {
-           // e.printStackTrace();.....................
+            throw new OIDCSSEServerException("Error while creating String entity");
         }
 
         httpPost.setEntity(se);
         httpPost.setHeader(HTTPConstants.HEADER_ACCEPT, HTTPConstants.MEDIA_TYPE_APPLICATION_JSON);
         httpPost.setHeader(HTTPConstants.HEADER_CONTENT_TYPE, HTTPConstants.MEDIA_TYPE_APPLICATION_JSON);
 
-        //TODO throw client exception
-        HttpResponse response = null;
         try {
-            response = client.execute(httpPost);
-            throw new OIDCSSEClientException();
-        } catch (IOException | OIDCSSEClientException e) {
-           // e.printStackTrace();.................................
+            client.execute(httpPost);
+        } catch (IOException e) {
+            throw new OIDCSSEClientException("Client http response error.");
         }
         if (LOG.isDebugEnabled()) {
-            LOG.debug(response.getStatusLine().getStatusCode());
+            LOG.debug("error while sending notification for the URL: " + url + "triggering event:" + eventName);
         }
     }
 
@@ -135,5 +148,3 @@ public class SseEventHandler extends AbstractEventHandler {
         return OIDCSSEConstants.EVENT_NAME;
     }
 }
-
-

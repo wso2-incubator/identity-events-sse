@@ -18,6 +18,9 @@
 
 package org.wso2.identity.oidc.sse.api;
 
+/**
+ * Contains the constants related to sse component
+ */
 public class Constants {
 
     public class Scope {

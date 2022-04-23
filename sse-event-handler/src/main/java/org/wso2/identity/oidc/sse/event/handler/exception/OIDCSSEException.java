@@ -25,16 +25,14 @@ import org.wso2.carbon.identity.base.IdentityException;
  */
 public class OIDCSSEException extends IdentityException {
 
-    public OIDCSSEException() {
+    public OIDCSSEException(String message) {
 
         super(message);
-        this.setErrorCode(getDefaultErrorCode());
     }
 
     public OIDCSSEException(String errorCode, String message) {
 
         super(errorCode, message);
-        this.setErrorCode(errorCode);
     }
 
     public OIDCSSEException(String message, Throwable cause) {
@@ -45,16 +43,5 @@ public class OIDCSSEException extends IdentityException {
     public OIDCSSEException(String errorCode, String message, Throwable cause) {
 
         super(errorCode, message, cause);
-        this.setErrorCode(errorCode);
-    }
-
-    public String getErrorDescription() {
-
-        return this.getMessage();
-    }
-
-    private String getDefaultErrorCode() {
-
-        return super.getErrorCode();
     }
 }

@@ -1,19 +1,21 @@
 /*
- * Copyright (c) 2022, WSO2 Inc. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright (c) 2022, WSO2 Inc. (http://www.wso2.com).
+ *  *
+ *  * WSO2 Inc. licenses this file to you under the Apache License,
+ *  * Version 2.0 (the "License"); you may not use this file except
+ *  * in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  * http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing,
+ *  * software distributed under the License is distributed on an
+ *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  * KIND, either express or implied.  See the License for the
+ *  * specific language governing permissions and limitations
+ *  * under the License.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
  */
 
 package org.wso2.identity.oidc.sse.api.stream;
@@ -74,12 +76,12 @@ public class StreamController {
     @ApiOperation(value = "", notes = "Retrieve current stream configuration")
     public ResponseEntity<?> getConfiguration(@RequestHeader(value = AUTHORIZATION) String accessToken) {
 
-        if (accessToken.isEmpty()) {
+        String id = validateAccessToken(accessToken);
+        if (id == null) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
-        String token = accessToken.substring(7);
-        String id = getClientId(token);
         Optional<Stream> stream = streamRepository.findById(id);
+
         if (stream.isPresent()) {
             Stream getStream = new Stream(stream.get().getIss(), stream.get().getAud(), stream.get().getDelivery(),
                     stream.get().getEventsSupported(), stream.get().getEventsRequested(),
@@ -104,11 +106,10 @@ public class StreamController {
     public ResponseEntity<?> updateConfiguration(@RequestBody Stream config,
                                                  @RequestHeader(value = AUTHORIZATION) String accessToken) {
 
-        if (accessToken.isEmpty()) {
+        String id = validateAccessToken(accessToken);
+        if (id == null) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
-        String token = accessToken.substring(7);
-        String id = getClientId(token);
         Optional<Stream> stream = streamRepository.findById(id);
 
         if (stream.isPresent()) {
@@ -164,11 +165,10 @@ public class StreamController {
             "added" + " to the stream, events that have been enqueued in the stream, or status that has been set on " + "the stream " + "will also be deleted.")
     public ResponseEntity<?> deleteConfiguration(@RequestHeader(value = AUTHORIZATION) String accessToken) {
 
-        if (accessToken.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        String id = validateAccessToken(accessToken);
+        if (id == null) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
-        String token = accessToken.substring(7);
-        String id = getClientId(token);
         Optional<Stream> stream = streamRepository.findById(id);
 
         if (stream.isPresent()) {
@@ -193,11 +193,10 @@ public class StreamController {
     @ApiOperation(value = "", notes = "Checks the current status of an event stream ")
     public ResponseEntity<Stream> getStatus(@RequestHeader(value = AUTHORIZATION) String accessToken) {
 
-        if (accessToken.isEmpty()) {
+        String id = validateAccessToken(accessToken);
+        if (id == null) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
-        String token = accessToken.substring(7);
-        String id = getClientId(token);
         Optional<Stream> stream = streamRepository.findById(id);
 
         if (stream.isPresent()) {
@@ -219,11 +218,10 @@ public class StreamController {
     public ResponseEntity<Stream> updateStatus(@RequestBody Stream status,
                                                @RequestHeader(value = AUTHORIZATION) String accessToken) {
 
-        if (accessToken.isEmpty()) {
+        String id = validateAccessToken(accessToken);
+        if (id == null) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
-        String token = accessToken.substring(7);
-        String id = getClientId(token);
         Optional<Stream> stream = streamRepository.findById(id);
 
         if (stream.isPresent()) {
@@ -247,11 +245,10 @@ public class StreamController {
     public ResponseEntity addSubject(@RequestBody Subject subject,
                                      @RequestHeader(value = AUTHORIZATION) String accessToken) {
 
-        if (accessToken.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        String id = validateAccessToken(accessToken);
+        if (id == null) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
-        String token = accessToken.substring(7);
-        String id = getClientId(token);
         Optional<Stream> stream = streamRepository.findById(id);
 
         if (stream.isPresent()) {
@@ -281,11 +278,10 @@ public class StreamController {
     public ResponseEntity<?> removeSubject(@RequestBody Subject removeSubject,
                                            @RequestHeader(value = AUTHORIZATION) String accessToken) {
 
-        if (accessToken.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        String id = validateAccessToken(accessToken);
+        if (id == null) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
-        String token = accessToken.substring(7);
-        String id = getClientId(token);
         Optional<Stream> stream = streamRepository.findById(id);
 
         if (stream.isPresent()) {
@@ -296,32 +292,17 @@ public class StreamController {
             } catch (Exception e) {
 
             }
-            int flag = -1;
             for (int i = 0; i < newSubjects.size(); i++) {
                 if (StringUtils.equals(removeSubject.getFormat(), newSubjects.get(i).getFormat())) {
                     if (StringUtils.equals(removeSubject.getEmail(), newSubjects.get(i).getEmail())) {
-                        flag = i;
-                        break;
+                        newSubjects.remove(i);
+                        streamSelect.setSubjects(newSubjects);
+                        streamRepository.save(streamSelect);
+                        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
                     }
-                    //                    if (removeSubject.getIss().equals(newSubjects.get(i).getIss())) {
-                    //                        flag = i;
-                    //                        break;
-                    //                    }
-                    //                    if (removeSubject.getPhone_number().equals(newSubjects.get(i)
-                    //                    .getPhone_number())) {
-                    //                        flag = i;
-                    //                        break;
-                    //                   }
                 }
             }
-            if (flag != -1) {
-                newSubjects.remove(flag);
-                streamSelect.setSubjects(newSubjects);
-                streamRepository.save(streamSelect);
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
@@ -336,11 +317,10 @@ public class StreamController {
     @ApiOperation(value = "", notes = "Remove existing subject from the stream")
     public ResponseEntity<? extends Object> verification(@RequestHeader(value = AUTHORIZATION) String accessToken) {
 
-        if (accessToken.isEmpty()) {
+        String id = validateAccessToken(accessToken);
+        if (id == null) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
-        String token = accessToken.substring(7);
-        String id = getClientId(token);
         Optional<Stream> stream = streamRepository.findById(id);
 
         if (stream.isPresent()) {
@@ -349,6 +329,19 @@ public class StreamController {
             return new ResponseEntity<>(getStream, HttpStatus.OK);
         }
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     *
+     */
+    private String validateAccessToken(String accessToken) {
+
+        if (accessToken.isEmpty()) {
+            return null;
+        }
+        String token = accessToken.substring(7);
+        String id = getClientId(token);
+        return id;
     }
 
     /**
@@ -373,4 +366,3 @@ public class StreamController {
         return temp.substring(0, temp.indexOf("\""));
     }
 }
-

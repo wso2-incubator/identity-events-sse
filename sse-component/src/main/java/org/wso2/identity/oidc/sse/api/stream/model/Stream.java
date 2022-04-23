@@ -35,6 +35,7 @@ public class Stream {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String iss;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String status;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -43,8 +44,11 @@ public class Stream {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<String> aud;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<String> eventsSupported;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<String> eventsRequested;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<String> eventsDelivered;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

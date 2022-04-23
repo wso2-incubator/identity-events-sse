@@ -95,7 +95,8 @@ public class EventController {
             }
         } else {
             if (log.isDebugEnabled()) {
-                log.debug("No stream found");
+                log.debug("There are no streams subscribed to event:" + event.getEvent() + "of subject:"
+                        + event.getSubject());
             }
         }
     }

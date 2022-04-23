@@ -23,9 +23,9 @@ package org.wso2.identity.oidc.sse.event.handler.exception;
  */
 public class OIDCSSEClientException extends OIDCSSEException {
 
-    public OIDCSSEClientException() {
+    public OIDCSSEClientException(String message) {
 
-        super();
+        super(message);
     }
 
     public OIDCSSEClientException(String errorCode, String message) {

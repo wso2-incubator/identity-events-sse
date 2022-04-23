@@ -101,4 +101,3 @@ public class Event {
         this.event = event;
     }
 }
-
