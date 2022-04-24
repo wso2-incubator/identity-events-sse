@@ -18,6 +18,9 @@
 
 package org.wso2.identity.oidc.sse.api;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Contains the constants related to sse component
  */
@@ -50,5 +53,10 @@ public class Constants {
     public static final String CLIENT_SECRET = "${spring.security.oauth2.resourceserver.opaque" + ".introspection" +
             "-client-secret}";
 
-    public static final String DEFAULT_STATUS = "enabled";
+    public static class data {
+
+        public static final String DEFAULT_STATUS = "enabled";
+        public static final List<String> EVENTS_SUPPORTED= Arrays.asList("urn:example:secevent:events:type_1",
+                "urn:example:secevent",":events:type_2", "urn:example:secevent:events:type_3");
+    }
 }

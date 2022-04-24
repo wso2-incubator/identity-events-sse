@@ -137,12 +137,9 @@ public class StreamController {
 
         try {
             config.setId(id);
-            //TODO move to constants
-            config.setStatus(Constants.DEFAULT_STATUS);
-            config.setEventsSupported(Arrays.asList("urn:example:secevent:events:type_1", "urn:example:secevent" +
-                    ":events:type_2", "urn:example:secevent:events:type_3"));
-            config.setEventsDelivered(Arrays.asList("urn:example:secevent:events:type_2", "urn:example:secevent" +
-                    ":events:type_3", "urn:example:secevent:events:type_4"));
+            config.setStatus(Constants.data.DEFAULT_STATUS);
+            config.setEventsSupported(Constants.data.EVENTS_SUPPORTED);
+            config.setEventsDelivered(Arrays.asList());
 
             streamRepository.save(config);
             Stream createdStream = new Stream(config.getIss(), config.getAud(), config.getDelivery(),
@@ -162,7 +159,8 @@ public class StreamController {
      */
     @DeleteMapping("stream")
     @ApiOperation(value = "", notes = "Resets to the streams default configuration. All subjects that have been " +
-            "added" + " to the stream, events that have been enqueued in the stream, or status that has been set on " + "the stream " + "will also be deleted.")
+            "added to the stream, events that have been enqueued in the stream, or status that has been set on " +
+            "the stream will also be deleted.")
     public ResponseEntity<?> deleteConfiguration(@RequestHeader(value = AUTHORIZATION) String accessToken) {
 
         String id = validateAccessToken(accessToken);
@@ -332,7 +330,10 @@ public class StreamController {
     }
 
     /**
+     * Validate access token and get id
      *
+     * @param accessToken Authorization token.
+     * @return stream id
      */
     private String validateAccessToken(String accessToken) {
 

@@ -244,6 +244,10 @@ public class Transmitter {
     @Override
     public String toString() {
 
-        return "Transmitter{" + "issuer='" + issuer + '\'' + ", jwksUri='" + jwksUri + '\'' + ", addSubjectEndpoint" + "='" + addSubjectEndpoint + '\'' + ", removeSubjectEndpoint='" + removeSubjectEndpoint + '\'' + ", " + "verificationEndpoint='" + verificationEndpoint + '\'' + ", statusEndpoint='" + statusEndpoint + '\'' + ", configurationEndpoint='" + configurationEndpoint + '\'' + ", criticalSubjectMembers=" + criticalSubjectMembers + ", deliveryMethodsSupported=" + deliveryMethodsSupported + '}';
+        return "Transmitter{" + "issuer='" + issuer + '\'' + ", jwksUri='" + jwksUri + '\'' + ", addSubjectEndpoint" +
+                "='" + addSubjectEndpoint + '\'' + ", removeSubjectEndpoint='" + removeSubjectEndpoint + '\'' + ", " +
+                "verificationEndpoint='" + verificationEndpoint + '\'' + ", statusEndpoint='" + statusEndpoint + '\'' +
+                ", configurationEndpoint='" + configurationEndpoint + '\'' + ", criticalSubjectMembers=" +
+                criticalSubjectMembers + ", deliveryMethodsSupported=" + deliveryMethodsSupported + '}';
     }
 }
