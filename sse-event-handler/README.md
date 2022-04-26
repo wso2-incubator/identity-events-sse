@@ -24,8 +24,8 @@ Tested with IS-5.7.0
 1) Login to the IS management console. Eg : login with admin user credentials
 2) In the carbon logs you should be able to see
 ```
-INFO {org.wso2.custom.event.handler.CustomEventHandler} -  Custom event handler received events successfully.
-INFO {org.wso2.custom.event.handler.CustomEventHandler} -  Authenticated user : admin
+INFO {SseEventHandler} -  Custom event handler received events successfully.
+INFO {SseEventHandler} -  Authenticated user : admin
 
 ```
 

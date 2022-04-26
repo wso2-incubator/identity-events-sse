@@ -1,22 +1,24 @@
 /*
- * Copyright (c) 2022, WSO2 Inc. (http://www.wso2.com).
  *
- * WSO2 Inc. licenses this file to you under the Apache License,
- * Version 2.0 (the "License"); you may not use this file except
- * in compliance with the License.
- * You may obtain a copy of the License at
+ *  * Copyright (c) 2022, WSO2 Inc. (http://www.wso2.com).
+ *  *
+ *  * WSO2 Inc. licenses this file to you under the Apache License,
+ *  * Version 2.0 (the "License"); you may not use this file except
+ *  * in compliance with the License.
+ *  * You may obtain a copy of the License at
+ *  *
+ *  * http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  * Unless required by applicable law or agreed to in writing,
+ *  * software distributed under the License is distributed on an
+ *  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  * KIND, either express or implied.  See the License for the
+ *  * specific language governing permissions and limitations
+ *  * under the License.
  *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
  */
 
-package org.wso2.identity.oidc.sse.event.handler;
+package org.wso2.custom.event.handler;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -30,13 +32,14 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONObject;
 import org.wso2.carbon.identity.event.IdentityEventConstants;
+import org.wso2.carbon.identity.event.IdentityEventException;
 import org.wso2.carbon.identity.event.event.Event;
 import org.wso2.carbon.identity.event.handler.AbstractEventHandler;
 import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
 import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import org.wso2.identity.oidc.sse.event.handler.exception.OIDCSSEClientException;
-import org.wso2.identity.oidc.sse.event.handler.exception.OIDCSSEServerException;
+import org.wso2.custom.event.handler.exception.OIDCSSEClientException;
+import org.wso2.custom.event.handler.exception.OIDCSSEServerException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -50,7 +53,7 @@ public class SseEventHandler extends AbstractEventHandler {
     private static Log LOG = LogFactory.getLog(SseEventHandler.class);
 
     @Override
-    public void handleEvent(Event event) {
+    public void handleEvent(Event event) throws IdentityEventException {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Custom event handler received events successfully.");
@@ -67,8 +70,9 @@ public class SseEventHandler extends AbstractEventHandler {
                     e.printStackTrace();
                 }
             }
-            JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().issuer(userName).audience(OIDCSSEConstants.AUDIENCE).
-                            subject(OIDCSSEConstants.TENANT_ID).build();
+            JWTClaimsSet claimsSet =
+                    new JWTClaimsSet.Builder().issuer(userName).audience("aud1").subject(OIDCSSEConstants.TENANT_ID)
+                            .build();
 
             String token = null;
             try {
@@ -83,26 +87,18 @@ public class SseEventHandler extends AbstractEventHandler {
                     }
                 }
             }
-
             if (LOG.isDebugEnabled()) {
                 LOG.debug(token);
             }
 
             String url = this.configs.getModuleProperties().getProperty(OIDCSSEConstants.URL);
 
-            if (StringUtils.isEmpty(url)) {
-                try {
-                    throw new OIDCSSEServerException("Url not available");
-                } catch (OIDCSSEServerException e) {
-                    e.printStackTrace();
-                }
-            }
             try {
                 sendNotification(url, token, userName, event.getEventName());
             } catch (OIDCSSEServerException | OIDCSSEClientException e) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("error while sending notification for the URL: " + url + "triggering event:"
-                            + event.getEventName());
+                    LOG.debug("error while sending notification for the URL: " + url + "triggering event:" +
+                            event.getEventName());
                 }
             }
         }
@@ -148,3 +144,5 @@ public class SseEventHandler extends AbstractEventHandler {
         return OIDCSSEConstants.EVENT_NAME;
     }
 }
+
+
