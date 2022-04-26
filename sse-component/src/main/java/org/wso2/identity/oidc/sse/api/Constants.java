@@ -48,15 +48,23 @@ public class Constants {
         public static final String EVENT = "/event";
     }
 
-    public static final String INTROSPECTION_URI = "${spring.security.oauth2.resourceserver.opaque.introspection-uri}";
-    public static final String CLIENT_ID = "${spring.security.oauth2.resourceserver.opaque.introspection-client-id}";
-    public static final String CLIENT_SECRET = "${spring.security.oauth2.resourceserver.opaque" + ".introspection" +
-            "-client-secret}";
+    public static class Introspection {
 
-    public static class data {
+        public static final String INTROSPECTION_URI = "${spring.security.oauth2.resourceserver.opaque" +
+                ".introspection-uri}";
+        public static final String CLIENT_ID = "${spring.security.oauth2.resourceserver.opaque.introspection" +
+                "-client-id}";
+        public static final String CLIENT_SECRET = "${spring.security.oauth2.resourceserver.opaque.introspection" +
+                "-client-secret}";
+    }
+
+    public static class Data {
 
         public static final String DEFAULT_STATUS = "enabled";
-        public static final List<String> EVENTS_SUPPORTED= Arrays.asList("urn:example:secevent:events:type_1",
-                "urn:example:secevent",":events:type_2", "urn:example:secevent:events:type_3");
+        public static final List<String> EVENTS_SUPPORTED = Arrays.asList("POST_UPDATE_CREDENTIAL_BY_ADMIN",
+                "POST_UPDATE_CREDENTIAL");
     }
+
+    public static final String CLIENT_ID = "client_id";
+    public static final String TOKEN = "token";
 }

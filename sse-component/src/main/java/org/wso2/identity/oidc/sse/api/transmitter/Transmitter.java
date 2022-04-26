@@ -240,14 +240,4 @@ public class Transmitter {
 
         this.configurationEndpoint = configurationEndpoint;
     }
-
-    @Override
-    public String toString() {
-
-        return "Transmitter{" + "issuer='" + issuer + '\'' + ", jwksUri='" + jwksUri + '\'' + ", addSubjectEndpoint" +
-                "='" + addSubjectEndpoint + '\'' + ", removeSubjectEndpoint='" + removeSubjectEndpoint + '\'' + ", " +
-                "verificationEndpoint='" + verificationEndpoint + '\'' + ", statusEndpoint='" + statusEndpoint + '\'' +
-                ", configurationEndpoint='" + configurationEndpoint + '\'' + ", criticalSubjectMembers=" +
-                criticalSubjectMembers + ", deliveryMethodsSupported=" + deliveryMethodsSupported + '}';
-    }
 }

@@ -46,7 +46,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 /**
- * Handle SSE events.
+ * Receive SSE events and send them to the SSE component.
  */
 public class SseEventHandler extends AbstractEventHandler {
 
@@ -56,36 +56,30 @@ public class SseEventHandler extends AbstractEventHandler {
     public void handleEvent(Event event) throws IdentityEventException {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Custom event handler received events successfully.");
+            LOG.debug("SSE event handler received event: " + event.getEventName());
         }
 
         if (StringUtils.equals(IdentityEventConstants.Event.POST_UPDATE_CREDENTIAL_BY_ADMIN, event.getEventName())) {
             Map<String, Object> eventProperties = event.getEventProperties();
             String userName = (String) eventProperties.get(IdentityEventConstants.EventProperty.USER_NAME);
 
-            if (StringUtils.isEmpty(userName)) {
-                try {
+            try {
+                if (StringUtils.isEmpty(userName)) {
                     throw new OIDCSSEServerException("Username not available");
-                } catch (OIDCSSEServerException e) {
-                    e.printStackTrace();
                 }
+            } catch (OIDCSSEServerException e) {
+                throw new IdentityEventException(e.getMessage());
             }
-            JWTClaimsSet claimsSet =
-                    new JWTClaimsSet.Builder().issuer(userName).audience("aud1").subject(OIDCSSEConstants.TENANT_ID)
-                            .build();
+
+            JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().issuer(userName).audience(OIDCSSEConstants.AUDIENCE)
+                            .subject(OIDCSSEConstants.TENANT_ID).build();
 
             String token = null;
             try {
                 token = OAuth2Util.signJWTWithRSA(claimsSet, JWSAlgorithm.RS256,
                         MultitenantConstants.SUPER_TENANT_DOMAIN_NAME).serialize();
             } catch (IdentityOAuth2Exception e) {
-                try {
-                    throw new OIDCSSEServerException("Error while generating token");
-                } catch (OIDCSSEServerException ex) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Error while generating token");
-                    }
-                }
+                throw new IdentityEventException("Error while generating token");
             }
             if (LOG.isDebugEnabled()) {
                 LOG.debug(token);
@@ -97,8 +91,7 @@ public class SseEventHandler extends AbstractEventHandler {
                 sendNotification(url, token, userName, event.getEventName());
             } catch (OIDCSSEServerException | OIDCSSEClientException e) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("error while sending notification for the URL: " + url + "triggering event:" +
-                            event.getEventName());
+                    LOG.debug(e.getMessage());
                 }
             }
         }

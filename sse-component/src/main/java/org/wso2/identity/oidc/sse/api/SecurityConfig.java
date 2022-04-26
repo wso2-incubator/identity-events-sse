@@ -34,13 +34,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Value(Constants.INTROSPECTION_URI)
+    @Value(Constants.Introspection.INTROSPECTION_URI)
     String introspectionUri;
 
-    @Value(Constants.CLIENT_ID)
+    @Value(Constants.Introspection.CLIENT_ID)
     String clientId;
 
-    @Value(Constants.CLIENT_SECRET)
+    @Value(Constants.Introspection.CLIENT_SECRET)
     String clientSecret;
 
     @Override
@@ -68,7 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                         .and().csrf().disable().authorizeRequests().antMatchers(Constants.Path.EVENT).permitAll();
             } catch (Exception e) {
-                log.error(e.toString());
+                log.error(e.getMessage());
             }
         }).oauth2ResourceServer(oauth2 -> oauth2.opaqueToken(token -> token.introspectionUri(this.introspectionUri)
                 .introspectionClientCredentials(this.clientId, this.clientSecret)));
