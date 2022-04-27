@@ -61,6 +61,12 @@ public class StreamController {
     @Value(Constants.Introspection.INTROSPECTION_URI)
     String introspectionUri;
 
+    @Value(Constants.Introspection.CLIENT_ID)
+    String username;
+
+    @Value(Constants.Introspection.CLIENT_SECRET)
+    String password;
+
     private final StreamRepository streamRepository;
 
     public StreamController(StreamRepository streamRepository) {
@@ -363,7 +369,7 @@ public class StreamController {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.setBasicAuth(Constants.Introspection.CLIENT_ID, Constants.Introspection.CLIENT_SECRET);
+        headers.setBasicAuth(username, password);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
         String result = restTemplate.postForObject(introspectionUri, entity, String.class);
