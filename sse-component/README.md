@@ -1,4 +1,4 @@
-# Smaple POC for Shared Signals and Events(SSE) Specification 
+# Sample POC for Shared Signals and Events(SSE) Specification 
 
 REST API based on Java Spring Boot that demonstrates how the [Shared Signals and Events (SSE)](https://openid.net/specs/openid-sse-framework-1_0-ID1.html) Framework works.
 

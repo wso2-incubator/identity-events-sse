@@ -46,11 +46,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 /**
- * Receive SSE events and send them to the SSE component.
+ * Receive internal events in IS and convert them to SSE format and send them to the SSE component.
  */
 public class SseEventHandler extends AbstractEventHandler {
 
-    private static Log LOG = LogFactory.getLog(SseEventHandler.class);
+    private static final Log LOG = LogFactory.getLog(SseEventHandler.class);
 
     @Override
     public void handleEvent(Event event) throws IdentityEventException {
@@ -59,58 +59,57 @@ public class SseEventHandler extends AbstractEventHandler {
             LOG.debug("SSE event handler received event: " + event.getEventName());
         }
 
-        if (StringUtils.equals(IdentityEventConstants.Event.POST_UPDATE_CREDENTIAL_BY_ADMIN, event.getEventName())) {
-            Map<String, Object> eventProperties = event.getEventProperties();
-            String userName = (String) eventProperties.get(IdentityEventConstants.EventProperty.USER_NAME);
+        Map<String, Object> eventProperties = event.getEventProperties();
+        String userName = (String) eventProperties.get(IdentityEventConstants.EventProperty.USER_NAME);
 
-            try {
-                if (StringUtils.isEmpty(userName)) {
-                    throw new OIDCSSEServerException("Username not available");
-                }
-            } catch (OIDCSSEServerException e) {
-                throw new IdentityEventException(e.getMessage());
-            }
-
-            JWTClaimsSet claimsSet = new JWTClaimsSet.Builder().issuer(userName).audience(OIDCSSEConstants.AUDIENCE)
-                            .subject(OIDCSSEConstants.TENANT_ID).build();
-
-            String token = null;
-            try {
-                token = OAuth2Util.signJWTWithRSA(claimsSet, JWSAlgorithm.RS256,
-                        MultitenantConstants.SUPER_TENANT_DOMAIN_NAME).serialize();
-            } catch (IdentityOAuth2Exception e) {
-                throw new IdentityEventException("Error while generating token");
-            }
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(token);
-            }
-
-            String url = this.configs.getModuleProperties().getProperty(OIDCSSEConstants.URL);
-
-            try {
-                sendNotification(url, token, userName, event.getEventName());
-            } catch (OIDCSSEServerException | OIDCSSEClientException e) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(e.getMessage());
-                }
-            }
+        if (StringUtils.isEmpty(userName)) {
+            throw new OIDCSSEServerException("Username not available in event: " + event.getEventName());
         }
+        //TODO constant issuer value -uri
+        JWTClaimsSet claimsSet =
+                new JWTClaimsSet.Builder().issuer(userName).audience(OIDCSSEConstants.AUDIENCE).subject(userName).build();
+
+        //        String securityEventToken;
+        //        try {
+        //            securityEventToken = OAuth2Util.signJWTWithRSA(claimsSet, JWSAlgorithm.RS256,
+        //                    MultitenantConstants.SUPER_TENANT_DOMAIN_NAME).serialize();
+        //        } catch (IdentityOAuth2Exception e) {
+        //            throw new OIDCSSEServerException("Error while generating token", e);
+        //        }
+
+        //        if (LOG.isDebugEnabled()) {
+        //            LOG.debug("Generated SET token: " + securityEventToken);
+        //        }
+
+        String url = this.configs.getModuleProperties().getProperty(OIDCSSEConstants.SSE_URL);
+        if (StringUtils.isEmpty(url)) {
+            throw new OIDCSSEServerException("Url not available in event: " + event.getEventName());
+        }
+
+        //        try {
+        //            sendNotification(url, securityEventToken, userName, event.getEventName());
+        //        } catch (OIDCSSEServerException | OIDCSSEClientException e) {
+        //            if (LOG.isErrorEnabled()) {
+        //                LOG.error(e.getMessage());
+        //            }
+        //        }
+    //    sendEvent(url, userName, event.getEventName(), time, issuer);
     }
 
-    private void sendNotification(String url, String token, String userName, String eventName) throws
-            OIDCSSEClientException, OIDCSSEServerException {
+    private void sendEvent(String url, String subject, String eventName, String time, String issuer) throws
+            OIDCSSEServerException {
 
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost httpPost = new HttpPost(url);
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.accumulate(OIDCSSEConstants.TOKEN, token);
-        jsonObject.accumulate(OIDCSSEConstants.SUBJECT, userName);
-        jsonObject.accumulate(OIDCSSEConstants.EVENT, eventName);
+        //        jsonObject.accumulate(OIDCSSEConstants.TOKEN, token);
+        //        jsonObject.accumulate(OIDCSSEConstants.SUBJECT, userName);
+        //        jsonObject.accumulate(OIDCSSEConstants.EVENT, eventName);
 
         String json = jsonObject.toString();
 
-        StringEntity se = null;
+        StringEntity se;
         try {
             se = new StringEntity(json);
         } catch (UnsupportedEncodingException e) {
@@ -124,18 +123,13 @@ public class SseEventHandler extends AbstractEventHandler {
         try {
             client.execute(httpPost);
         } catch (IOException e) {
-            throw new OIDCSSEClientException("Client http response error.");
-        }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("error while sending notification for the URL: " + url + "triggering event:" + eventName);
+            throw new OIDCSSEServerException("Error while sending SET for event : " + eventName + "with " + url, e);
         }
     }
 
     @Override
     public String getName() {
 
-        return OIDCSSEConstants.EVENT_NAME;
+        return OIDCSSEConstants.EVENT_HANDLER_NAME;
     }
 }
-
-

@@ -21,11 +21,12 @@
 package org.wso2.custom.event.handler.exception;
 
 import org.wso2.carbon.identity.base.IdentityException;
+import org.wso2.carbon.identity.event.IdentityEventException;
 
 /**
  * Used to create checked exceptions that can be handled.
  */
-public class OIDCSSEException extends IdentityException {
+public class OIDCSSEException extends IdentityEventException {
 
     public OIDCSSEException(String message) {
 

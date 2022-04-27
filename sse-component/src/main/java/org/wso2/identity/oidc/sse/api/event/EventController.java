@@ -73,10 +73,10 @@ public class EventController {
      */
     private void sendEvent(Event event) {
 
-        List<Stream> streams = streamRepository.findByEventsRequestedAndSubjectsEmail(event.getEvent(),
+        List<Stream> streams = streamRepository.findByEventsRequestedAndSubjectsEmail(event.getEventName(),
                 event.getSubject());
 
-        if (streams.size() > 0) {
+        if (!streams.isEmpty()) {
 
             MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
             map.add("token", event.getToken());
@@ -95,7 +95,7 @@ public class EventController {
             }
         } else {
             if (log.isDebugEnabled()) {
-                log.debug("There are no streams subscribed to event:" + event.getEvent() + "of subject:"
+                log.debug("There are no streams subscribed to event:" + event.getEventName() + "of subject:"
                         + event.getSubject());
             }
         }

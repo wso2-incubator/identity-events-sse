@@ -28,7 +28,7 @@ public class Event {
 
     private String token;
     private String subject;
-    private String event;
+    private String eventName;
 
     public Event() {
 
@@ -38,7 +38,7 @@ public class Event {
 
         this.token = token;
         this.subject = subject;
-        this.event = event;
+        this.eventName = event;
     }
 
     /**
@@ -86,18 +86,18 @@ public class Event {
      *
      * @return event name
      */
-    public String getEvent() {
+    public String getEventName() {
 
-        return event;
+        return eventName;
     }
 
     /**
      * Set event name
      *
-     * @param event event name
+     * @param eventName event name
      */
-    public void setEvent(String event) {
+    public void setEventName(String eventName) {
 
-        this.event = event;
+        this.eventName = eventName;
     }
 }

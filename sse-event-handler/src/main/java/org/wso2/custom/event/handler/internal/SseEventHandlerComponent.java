@@ -26,7 +26,7 @@ import org.wso2.carbon.identity.event.handler.AbstractEventHandler;
 import org.wso2.custom.event.handler.SseEventHandler;
 
 /**
- * @scr.component name="custom.event.handler"
+ * @scr.component name="sse.event.handler"
  * immediate="true"
  */
 public class SseEventHandlerComponent {
@@ -38,13 +38,13 @@ public class SseEventHandlerComponent {
         SseEventHandler eventHandler = new SseEventHandler();
         // Register the custom listener as an OSGI service.
         ctxt.getBundleContext().registerService(AbstractEventHandler.class.getName(), eventHandler, null);
-        LOG.info("Custom event handler activated successfully.");
+        LOG.info("Event handler activated successfully.");
     }
 
     protected void deactivate(ComponentContext ctxt) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Custom event handler is deactivated ");
+            LOG.debug("Event handler is deactivated ");
         }
     }
 }

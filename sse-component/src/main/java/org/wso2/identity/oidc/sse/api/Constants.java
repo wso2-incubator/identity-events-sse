@@ -61,6 +61,7 @@ public class Constants {
     public static class Data {
 
         public static final String DEFAULT_STATUS = "enabled";
+        //TODO move to applications.properties - add comment that it should be added to deployment.toml
         public static final List<String> EVENTS_SUPPORTED = Arrays.asList("POST_UPDATE_CREDENTIAL_BY_ADMIN",
                 "POST_UPDATE_CREDENTIAL");
     }

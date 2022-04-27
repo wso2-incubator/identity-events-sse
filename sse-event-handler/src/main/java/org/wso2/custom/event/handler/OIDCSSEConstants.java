@@ -30,6 +30,6 @@ public class OIDCSSEConstants {
     public static final String EVENT = "event";
     public static final String AUDIENCE = "aud1";
     public static final String TENANT_ID = "tenantId";
-    public static final String URL = "custom.event.handler.url";
-    public static final String EVENT_NAME = "custom.event.handler";
+    public static final String SSE_URL = "sse.event.handler.url";
+    public static final String EVENT_HANDLER_NAME = "sse.event.handler";
 }
