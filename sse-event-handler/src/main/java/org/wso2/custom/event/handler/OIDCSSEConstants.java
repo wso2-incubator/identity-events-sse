@@ -25,11 +25,10 @@ package org.wso2.custom.event.handler;
  */
 public class OIDCSSEConstants {
 
-    public static final String TOKEN = "token";
     public static final String SUBJECT = "subject";
-    public static final String EVENT = "event";
-    public static final String AUDIENCE = "aud1";
-    public static final String TENANT_ID = "tenantId";
+    public static final String EVENT_NAME = "name";
     public static final String SSE_URL = "sse.event.handler.url";
     public static final String EVENT_HANDLER_NAME = "sse.event.handler";
+    public static final String ISSUER = "issuer";
+    public static final String ISSUER_URL="https://idp.sse.com/sse-issuer";
 }

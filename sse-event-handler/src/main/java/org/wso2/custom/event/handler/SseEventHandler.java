@@ -20,8 +20,6 @@
 
 package org.wso2.custom.event.handler;
 
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jwt.JWTClaimsSet;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -35,10 +33,6 @@ import org.wso2.carbon.identity.event.IdentityEventConstants;
 import org.wso2.carbon.identity.event.IdentityEventException;
 import org.wso2.carbon.identity.event.event.Event;
 import org.wso2.carbon.identity.event.handler.AbstractEventHandler;
-import org.wso2.carbon.identity.oauth2.IdentityOAuth2Exception;
-import org.wso2.carbon.identity.oauth2.util.OAuth2Util;
-import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
-import org.wso2.custom.event.handler.exception.OIDCSSEClientException;
 import org.wso2.custom.event.handler.exception.OIDCSSEServerException;
 
 import java.io.IOException;
@@ -65,47 +59,24 @@ public class SseEventHandler extends AbstractEventHandler {
         if (StringUtils.isEmpty(userName)) {
             throw new OIDCSSEServerException("Username not available in event: " + event.getEventName());
         }
-        //TODO constant issuer value -uri
-        JWTClaimsSet claimsSet =
-                new JWTClaimsSet.Builder().issuer(userName).audience(OIDCSSEConstants.AUDIENCE).subject(userName).build();
-
-        //        String securityEventToken;
-        //        try {
-        //            securityEventToken = OAuth2Util.signJWTWithRSA(claimsSet, JWSAlgorithm.RS256,
-        //                    MultitenantConstants.SUPER_TENANT_DOMAIN_NAME).serialize();
-        //        } catch (IdentityOAuth2Exception e) {
-        //            throw new OIDCSSEServerException("Error while generating token", e);
-        //        }
-
-        //        if (LOG.isDebugEnabled()) {
-        //            LOG.debug("Generated SET token: " + securityEventToken);
-        //        }
 
         String url = this.configs.getModuleProperties().getProperty(OIDCSSEConstants.SSE_URL);
         if (StringUtils.isEmpty(url)) {
             throw new OIDCSSEServerException("Url not available in event: " + event.getEventName());
         }
 
-        //        try {
-        //            sendNotification(url, securityEventToken, userName, event.getEventName());
-        //        } catch (OIDCSSEServerException | OIDCSSEClientException e) {
-        //            if (LOG.isErrorEnabled()) {
-        //                LOG.error(e.getMessage());
-        //            }
-        //        }
-    //    sendEvent(url, userName, event.getEventName(), time, issuer);
+        sendEvent(url, userName, event.getEventName());
     }
 
-    private void sendEvent(String url, String subject, String eventName, String time, String issuer) throws
-            OIDCSSEServerException {
+    private void sendEvent(String url, String subject, String eventName) throws OIDCSSEServerException {
 
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost httpPost = new HttpPost(url);
 
         JSONObject jsonObject = new JSONObject();
-        //        jsonObject.accumulate(OIDCSSEConstants.TOKEN, token);
-        //        jsonObject.accumulate(OIDCSSEConstants.SUBJECT, userName);
-        //        jsonObject.accumulate(OIDCSSEConstants.EVENT, eventName);
+        jsonObject.accumulate(OIDCSSEConstants.SUBJECT, subject);
+        jsonObject.accumulate(OIDCSSEConstants.ISSUER, OIDCSSEConstants.ISSUER_URL);
+        jsonObject.accumulate(OIDCSSEConstants.EVENT_NAME, eventName);
 
         String json = jsonObject.toString();
 

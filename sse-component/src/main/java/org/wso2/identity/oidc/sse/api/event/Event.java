@@ -26,19 +26,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "Event")
 public class Event {
 
-    private String token;
     private String subject;
-    private String eventName;
+    private String issuer;
+    private String name;
 
     public Event() {
 
     }
 
-    public Event(String subject, String event, String token) {
+    public Event(String subject, String issuer, String name) {
 
-        this.token = token;
         this.subject = subject;
-        this.eventName = event;
+        this.issuer = issuer;
+        this.name = name;
     }
 
     /**
@@ -62,23 +62,23 @@ public class Event {
     }
 
     /**
-     * Get token value
+     * Get the issuer of the event.
      *
-     * @return token
+     * @return issuer url
      */
-    public String getToken() {
+    public String getIssuer() {
 
-        return token;
+        return issuer;
     }
 
     /**
-     * Set token value
+     * Set the issuer of the event.
      *
-     * @param token token value
+     * @param issuer issuer url
      */
-    public void setToken(String token) {
+    public void setIssuer(String issuer) {
 
-        this.token = token;
+        this.issuer = issuer;
     }
 
     /**
@@ -86,18 +86,18 @@ public class Event {
      *
      * @return event name
      */
-    public String getEventName() {
+    public String getName() {
 
-        return eventName;
+        return name;
     }
 
     /**
      * Set event name
      *
-     * @param eventName event name
+     * @param name event name
      */
-    public void setEventName(String eventName) {
+    public void setName(String name) {
 
-        this.eventName = eventName;
+        this.name = name;
     }
 }
