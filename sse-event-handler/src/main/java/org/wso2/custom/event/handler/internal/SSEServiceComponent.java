@@ -17,6 +17,7 @@
  *  * under the License.
  *
  */
+
 package org.wso2.custom.event.handler.internal;
 
 import org.apache.commons.logging.Log;
@@ -29,9 +30,9 @@ import org.wso2.custom.event.handler.SSEEventHandler;
  * @scr.component name="sse.event.handler"
  * immediate="true"
  */
-public class SseEventHandlerComponent {
+public class SSEServiceComponent {
 
-    private static Log LOG = LogFactory.getLog(SseEventHandlerComponent.class);
+    private static Log LOG = LogFactory.getLog(SSEServiceComponent.class);
 
     protected void activate(ComponentContext ctxt) {
 

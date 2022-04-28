@@ -18,6 +18,8 @@
  *
  */
 
+//TODO chang custom to sse
+
 package org.wso2.custom.event.handler;
 
 import org.apache.axis2.transport.http.HTTPConstants;
@@ -52,19 +54,15 @@ public class SSEEventHandler extends AbstractEventHandler {
         if (LOG.isDebugEnabled()) {
             LOG.debug("SSE event handler received event: " + event.getEventName());
         }
-
         Map<String, Object> eventProperties = event.getEventProperties();
         String userName = (String) eventProperties.get(IdentityEventConstants.EventProperty.USER_NAME);
-
         if (StringUtils.isEmpty(userName)) {
-            throw new OIDCSSEServerException("Username not available in event: " + event.getEventName());
+            throw new OIDCSSEServerException("Username is not available in event: " + event.getEventName());
         }
-
         String sseUrl = this.configs.getModuleProperties().getProperty(OIDCSSEConstants.SSE_URL);
         if (StringUtils.isEmpty(sseUrl)) {
-            throw new OIDCSSEServerException("Url not available in event: " + event.getEventName());
+            throw new OIDCSSEServerException("URL of the SSE component not available in event: " + event.getEventName());
         }
-
         sendEvent(sseUrl, userName, event.getEventName());
     }
 
@@ -72,25 +70,20 @@ public class SSEEventHandler extends AbstractEventHandler {
 
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost httpPost = new HttpPost(sseUrl);
-
         JSONObject requestObject = new JSONObject();
         requestObject.put(OIDCSSEConstants.SUBJECT, subject);
         requestObject.put(OIDCSSEConstants.ISSUER, OIDCSSEConstants.ISSUER_URL);
         requestObject.put(OIDCSSEConstants.EVENT_NAME, eventName);
-
         StringEntity requestString;
         try {
             requestString = new StringEntity(requestObject.toString());
-        } catch (UnsupportedEncodingException e) {
-            throw new OIDCSSEServerException("Error while creating String entity");
-        }
-        //TODO change to name value pair later
-        httpPost.setEntity(requestString);
-        httpPost.setHeader(HTTPConstants.HEADER_ACCEPT, HTTPConstants.MEDIA_TYPE_APPLICATION_JSON);
-        httpPost.setHeader(HTTPConstants.HEADER_CONTENT_TYPE, HTTPConstants.MEDIA_TYPE_APPLICATION_JSON);
-
-        try {
+            //TODO change to name value pair - later
+            httpPost.setEntity(requestString);
+            httpPost.setHeader(HTTPConstants.HEADER_ACCEPT, HTTPConstants.MEDIA_TYPE_APPLICATION_JSON);
+            httpPost.setHeader(HTTPConstants.HEADER_CONTENT_TYPE, HTTPConstants.MEDIA_TYPE_APPLICATION_JSON);
             client.execute(httpPost);
+        } catch (UnsupportedEncodingException e) {
+            throw new OIDCSSEServerException("Error while creating String entity", e);
         } catch (IOException e) {
             throw new OIDCSSEServerException("Error while sending SET for event : " + eventName + "with " + sseUrl, e);
         }

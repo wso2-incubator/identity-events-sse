@@ -20,7 +20,7 @@
 
 package org.wso2.custom.event.handler.exception;
 
-public class OIDCSSEServerException extends OIDCSSEException{
+public class OIDCSSEServerException extends OIDCSSEException {
 
     public OIDCSSEServerException(String message) {
 

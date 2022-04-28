@@ -55,7 +55,6 @@ public class TransmitterController {
     public ResponseEntity<?> getConfiguration() {
 
         List<Transmitter> transmittersList = transmitterRepository.findAll();
-
         if (transmittersList.size() == 1) {
             return new ResponseEntity<>(transmittersList.get(0), HttpStatus.OK);
         }

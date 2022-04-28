@@ -20,7 +20,6 @@
 
 package org.wso2.custom.event.handler.exception;
 
-import org.wso2.carbon.identity.base.IdentityException;
 import org.wso2.carbon.identity.event.IdentityEventException;
 
 /**

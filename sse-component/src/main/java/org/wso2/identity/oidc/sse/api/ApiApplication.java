@@ -46,13 +46,12 @@ public class ApiApplication {
     @Bean
     public Docket swaggerConfig() {
 
-        return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage(this.getClass()
-                .getPackage().getName())).paths(PathSelectors.any()).build().apiInfo(apiInfo());
+        return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.basePackage(this.getClass().getPackage().getName())).paths(PathSelectors.any()).build().apiInfo(apiInfo());
     }
 
     private ApiInfo apiInfo() {
 
-        //TODO add to properties file later
+        //TODO add to properties file - later
         return new ApiInfoBuilder().title("Sample SSE API").version("1.0.0").build();
     }
 }

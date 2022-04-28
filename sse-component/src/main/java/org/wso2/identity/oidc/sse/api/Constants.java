@@ -58,6 +58,15 @@ public class Constants {
                 "-client-secret}";
     }
 
+    public static class Keystore {
+
+        public static final String sseSignatureAlgorithm = "${sse.signature.algorithm}";
+        public static final String keystorePath = "${sse.keystore.path}";
+        public static final String alias = "${sse.keystore.alias}";
+        public static final String password = "${sse.keystore.password}";
+        public static final String keystoreType = "{ sse.keystore.type}";
+    }
+
     public static class Data {
 
         public static final String DEFAULT_STATUS = "enabled";
@@ -68,4 +77,6 @@ public class Constants {
 
     public static final String CLIENT_ID = "client_id";
     public static final String TOKEN = "token";
+    public static final String RS256 = "RS256";
+    public static final String SHA512_WITH_HMAC = "SHA512_WITH_HMAC";
 }

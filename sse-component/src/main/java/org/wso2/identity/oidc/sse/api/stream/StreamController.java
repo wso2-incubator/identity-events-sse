@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.wso2.identity.oidc.sse.api.Constants;
+import org.wso2.identity.oidc.sse.api.exception.OIDCSSEException;
 import org.wso2.identity.oidc.sse.api.stream.model.Stream;
 import org.wso2.identity.oidc.sse.api.stream.model.Subject;
 
@@ -89,7 +90,6 @@ public class StreamController {
         }
         String id = getClientId(accessToken);
         Optional<Stream> stream = streamRepository.findById(id);
-
         if (stream.isPresent()) {
             Stream getStream = new Stream(stream.get().getIss(), stream.get().getAud(), stream.get().getDelivery(),
                     stream.get().getEventsSupported(), stream.get().getEventsRequested(),
@@ -119,7 +119,6 @@ public class StreamController {
         }
         String id = getClientId(accessToken);
         Optional<Stream> stream = streamRepository.findById(id);
-
         if (stream.isPresent()) {
             Stream streamUpdate = stream.get();
             streamUpdate.setId(id);
@@ -148,11 +147,9 @@ public class StreamController {
             config.setStatus(Constants.Data.DEFAULT_STATUS);
             config.setEventsSupported(Constants.Data.EVENTS_SUPPORTED);
             config.setEventsDelivered(Arrays.asList());
-
             streamRepository.save(config);
             Stream createdStream = new Stream(config.getIss(), config.getAud(), config.getDelivery(),
                     config.getEventsSupported(), config.getEventsRequested(), config.getEventsDelivered());
-
             return new ResponseEntity<>(createdStream, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -176,7 +173,6 @@ public class StreamController {
         }
         String id = getClientId(accessToken);
         Optional<Stream> stream = streamRepository.findById(id);
-
         if (stream.isPresent()) {
             Stream streamDelete = stream.get();
             streamDelete.setId(id);
@@ -185,7 +181,6 @@ public class StreamController {
             streamRepository.save(streamDelete);
             return new ResponseEntity<>(HttpStatus.OK);
         }
-
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
@@ -204,7 +199,6 @@ public class StreamController {
         }
         String id = getClientId(accessToken);
         Optional<Stream> stream = streamRepository.findById(id);
-
         if (stream.isPresent()) {
             Stream status = new Stream(stream.get().getStatus());
             return new ResponseEntity<>(status, HttpStatus.OK);
@@ -229,7 +223,6 @@ public class StreamController {
         }
         String id = getClientId(accessToken);
         Optional<Stream> stream = streamRepository.findById(id);
-
         if (stream.isPresent()) {
             Stream streamUpdate = stream.get();
             streamUpdate.setStatus(status.getStatus());
@@ -282,7 +275,8 @@ public class StreamController {
     @PostMapping("subjects:remove")
     @ApiOperation(value = "", notes = "Add new subject to the stream")
     public ResponseEntity<?> removeSubject(@RequestBody Subject removeSubject,
-                                           @RequestHeader(value = AUTHORIZATION) String accessToken) {
+                                           @RequestHeader(value = AUTHORIZATION) String accessToken) throws
+            OIDCSSEException {
 
         if (!validateAccessToken(accessToken)) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -296,7 +290,7 @@ public class StreamController {
             try {
                 newSubjects.addAll(streamSelect.getSubjects());
             } catch (Exception e) {
-
+                throw new OIDCSSEException("No streams selected");
             }
             for (int i = 0; i < newSubjects.size(); i++) {
                 if (StringUtils.equals(removeSubject.getFormat(), newSubjects.get(i).getFormat())) {
@@ -327,10 +321,8 @@ public class StreamController {
         if (!validateAccessToken(accessToken)) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
         }
-
         String id = getClientId(accessToken);
         Optional<Stream> stream = streamRepository.findById(id);
-
         if (stream.isPresent()) {
             Stream getStream = new Stream(stream.get().getIss(), stream.get().getAud(),
                     stream.get().getEventsDelivered());
@@ -362,20 +354,16 @@ public class StreamController {
     private String getClientId(String accessToken) {
 
         String requestBody = Constants.TOKEN + "=" + accessToken.substring(7);
-
         if (log.isDebugEnabled()) {
             log.debug(requestBody);
         }
-
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setBasicAuth(username, password);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
         String result = restTemplate.postForObject(introspectionUri, entity, String.class);
-
         String temp = result.substring(result.indexOf(Constants.CLIENT_ID) + 12);
-
         return temp.substring(0, temp.indexOf("\""));
     }
 }
