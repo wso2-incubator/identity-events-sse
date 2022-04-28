@@ -18,6 +18,7 @@
 
 package org.wso2.identity.oidc.sse.api.event;
 
+import com.nimbusds.jose.JOSEException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -29,9 +30,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.wso2.identity.oidc.sse.api.Constants;
+import org.wso2.identity.oidc.sse.api.exception.OIDCSSEException;
 import org.wso2.identity.oidc.sse.api.stream.StreamRepository;
 import org.wso2.identity.oidc.sse.api.stream.model.Stream;
 
+import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.List;
 
 /**
@@ -60,7 +68,8 @@ public class EventController {
      */
     @PostMapping
     @ApiOperation(value = "", notes = "Store events in database and send event to subscribers.")
-    public void newEvent(@RequestBody Event event) {
+    public void newEvent(@RequestBody Event event) throws UnrecoverableKeyException, OIDCSSEException,
+            CertificateException, IOException, NoSuchAlgorithmException, KeyStoreException, JOSEException {
 
         eventRepository.save(event);
         sendEvent(event);
@@ -71,25 +80,18 @@ public class EventController {
      *
      * @param event event instance
      */
-    private void sendEvent(Event event) {
+    private void sendEvent(Event event) throws UnrecoverableKeyException, OIDCSSEException, CertificateException,
+            IOException, NoSuchAlgorithmException, KeyStoreException, JOSEException {
 
         List<Stream> streams = streamRepository.findByEventsRequestedAndSubjectsEmail(event.getName(),
                 event.getSubject());
-
         if (!streams.isEmpty()) {
-
             MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-
             for (int j = 0; streams.size() > j; j++) {
-
                 Stream stream = streams.get(j);
                 List<String> aud = stream.getAud();
-
-                SETTokenBuilder setTokenBuilder= new SETTokenBuilder();
-                String securityEventToken = setTokenBuilder.buildToken(event, aud);
-                System.out.println(securityEventToken);
-                map.add("token", securityEventToken);
-
+                String securityEventToken = new SETTokenBuilder.Builder().audience(aud).event(event).build();
+                map.add(Constants.TOKEN, securityEventToken);
                 for (int i = 0; stream.getAud().size() > i; i++) {
                     String uri = stream.getAud().get(i);
                     RestTemplate restTemplate = new RestTemplate();

@@ -42,9 +42,9 @@ import java.util.Map;
 /**
  * Receive internal events in IS and convert them to SSE format and send them to the SSE component.
  */
-public class SseEventHandler extends AbstractEventHandler {
+public class SSEEventHandler extends AbstractEventHandler {
 
-    private static final Log LOG = LogFactory.getLog(SseEventHandler.class);
+    private static final Log LOG = LogFactory.getLog(SSEEventHandler.class);
 
     @Override
     public void handleEvent(Event event) throws IdentityEventException {
@@ -60,41 +60,39 @@ public class SseEventHandler extends AbstractEventHandler {
             throw new OIDCSSEServerException("Username not available in event: " + event.getEventName());
         }
 
-        String url = this.configs.getModuleProperties().getProperty(OIDCSSEConstants.SSE_URL);
-        if (StringUtils.isEmpty(url)) {
+        String sseUrl = this.configs.getModuleProperties().getProperty(OIDCSSEConstants.SSE_URL);
+        if (StringUtils.isEmpty(sseUrl)) {
             throw new OIDCSSEServerException("Url not available in event: " + event.getEventName());
         }
 
-        sendEvent(url, userName, event.getEventName());
+        sendEvent(sseUrl, userName, event.getEventName());
     }
 
-    private void sendEvent(String url, String subject, String eventName) throws OIDCSSEServerException {
+    private void sendEvent(String sseUrl, String subject, String eventName) throws OIDCSSEServerException {
 
         HttpClient client = HttpClientBuilder.create().build();
-        HttpPost httpPost = new HttpPost(url);
+        HttpPost httpPost = new HttpPost(sseUrl);
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.accumulate(OIDCSSEConstants.SUBJECT, subject);
-        jsonObject.accumulate(OIDCSSEConstants.ISSUER, OIDCSSEConstants.ISSUER_URL);
-        jsonObject.accumulate(OIDCSSEConstants.EVENT_NAME, eventName);
+        JSONObject requestObject = new JSONObject();
+        requestObject.put(OIDCSSEConstants.SUBJECT, subject);
+        requestObject.put(OIDCSSEConstants.ISSUER, OIDCSSEConstants.ISSUER_URL);
+        requestObject.put(OIDCSSEConstants.EVENT_NAME, eventName);
 
-        String json = jsonObject.toString();
-
-        StringEntity se;
+        StringEntity requestString;
         try {
-            se = new StringEntity(json);
+            requestString = new StringEntity(requestObject.toString());
         } catch (UnsupportedEncodingException e) {
             throw new OIDCSSEServerException("Error while creating String entity");
         }
-
-        httpPost.setEntity(se);
+        //TODO change to name value pair later
+        httpPost.setEntity(requestString);
         httpPost.setHeader(HTTPConstants.HEADER_ACCEPT, HTTPConstants.MEDIA_TYPE_APPLICATION_JSON);
         httpPost.setHeader(HTTPConstants.HEADER_CONTENT_TYPE, HTTPConstants.MEDIA_TYPE_APPLICATION_JSON);
 
         try {
             client.execute(httpPost);
         } catch (IOException e) {
-            throw new OIDCSSEServerException("Error while sending SET for event : " + eventName + "with " + url, e);
+            throw new OIDCSSEServerException("Error while sending SET for event : " + eventName + "with " + sseUrl, e);
         }
     }
 

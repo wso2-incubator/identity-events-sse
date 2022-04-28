@@ -66,12 +66,6 @@ public class Constants {
                 "POST_UPDATE_CREDENTIAL");
     }
 
-    public static class Keystore{
-        public static final String ALIAS ="wso2carbon";
-        public static final String PASSWORD ="wso2carbon";
-        public static final String KEYSTORE_TYPE="jks";
-    }
-
     public static final String CLIENT_ID = "client_id";
     public static final String TOKEN = "token";
 }

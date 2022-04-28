@@ -23,7 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.osgi.service.component.ComponentContext;
 import org.wso2.carbon.identity.event.handler.AbstractEventHandler;
-import org.wso2.custom.event.handler.SseEventHandler;
+import org.wso2.custom.event.handler.SSEEventHandler;
 
 /**
  * @scr.component name="sse.event.handler"
@@ -35,7 +35,7 @@ public class SseEventHandlerComponent {
 
     protected void activate(ComponentContext ctxt) {
 
-        SseEventHandler eventHandler = new SseEventHandler();
+        SSEEventHandler eventHandler = new SSEEventHandler();
         // Register the custom listener as an OSGI service.
         ctxt.getBundleContext().registerService(AbstractEventHandler.class.getName(), eventHandler, null);
         LOG.info("Event handler activated successfully.");
