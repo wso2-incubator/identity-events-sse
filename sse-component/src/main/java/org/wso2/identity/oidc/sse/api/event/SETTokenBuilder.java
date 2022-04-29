@@ -23,6 +23,7 @@ package org.wso2.identity.oidc.sse.api.event;
 import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.wso2.identity.oidc.sse.api.Constants;
 import org.wso2.identity.oidc.sse.api.exception.OIDCSSEException;
 
@@ -33,22 +34,58 @@ import java.util.List;
  * Build the security event token.
  */
 @Slf4j
+@Component
 public class SETTokenBuilder {
 
-    @Value(Constants.Keystore.sseSignatureAlgorithm)
-    static String sseSignatureAlgorithm;
+    @Value(Constants.Keystore.SSE_SIGNATURE_ALGORITHM)
+    private String sseSignatureAlgorithm;
+    private static String SSE_SIGNATURE_ALGORITHM;
 
-    @Value(Constants.Keystore.keystorePath)
-    static String keystorePath;
+    @Value(Constants.Keystore.SSE_SIGNATURE_ALGORITHM)
+    public void setSseSignatureAlgorithmStatic(String sseSignatureAlgorithm) {
 
-    @Value(Constants.Keystore.alias)
-    static String alias;
+        SETTokenBuilder.SSE_SIGNATURE_ALGORITHM = sseSignatureAlgorithm;
+    }
 
-    @Value(Constants.Keystore.password)
-    static String password;
+    @Value(Constants.Keystore.KEYSTORE_PATH)
+    private String keystorePath;
+    private static String KEYSTORE_PATH_STATIC;
 
-    @Value(Constants.Keystore.keystoreType)
-    static String keystoreType;
+    @Value(Constants.Keystore.KEYSTORE_PATH)
+    public void setKeystorePath(String keystorePath) {
+
+        SETTokenBuilder.KEYSTORE_PATH_STATIC = keystorePath;
+    }
+
+    @Value(Constants.Keystore.ALIAS)
+    private String alias;
+    private static String ALIAS_STATIC;
+
+    @Value(Constants.Keystore.ALIAS)
+    public void setAliasStatic(String alias) {
+
+        SETTokenBuilder.ALIAS_STATIC = alias;
+    }
+
+    @Value(Constants.Keystore.PASSWORD)
+    private String password;
+    private static String PASSWORD_STATIC;
+
+    @Value(Constants.Keystore.PASSWORD)
+    public void setPasswordStatic(String password) {
+
+        SETTokenBuilder.PASSWORD_STATIC = password;
+    }
+
+    @Value(Constants.Keystore.KEYSTORE_TYPE)
+    private String keystoreType;
+    private static String KEYSTORE_TYPE_STATIC;
+
+    @Value(Constants.Keystore.KEYSTORE_TYPE)
+    public void setKeystoreTypeStatic(String keystoreType) {
+
+        SETTokenBuilder.KEYSTORE_TYPE_STATIC = keystoreType;
+    }
 
     public static class Builder {
 
@@ -74,8 +111,9 @@ public class SETTokenBuilder {
         public String build() throws OIDCSSEException {
 
             JWTClaimsSet jwtClaimsSet = SSEUtil.getJWT(event, audience);
-            RSAPrivateKey privateKey = SSEUtil.getPrivateKey(keystorePath, alias, password, keystoreType);
-            return SSEUtil.signJwtWithRSA(jwtClaimsSet, sseSignatureAlgorithm, privateKey);
+            RSAPrivateKey privateKey = SSEUtil.getPrivateKey(KEYSTORE_PATH_STATIC, ALIAS_STATIC, PASSWORD_STATIC,
+                    KEYSTORE_TYPE_STATIC);
+            return SSEUtil.signJwtWithRSA(jwtClaimsSet, SSE_SIGNATURE_ALGORITHM, privateKey);
         }
     }
 }

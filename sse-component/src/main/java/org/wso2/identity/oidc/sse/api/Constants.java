@@ -60,11 +60,11 @@ public class Constants {
 
     public static class Keystore {
 
-        public static final String sseSignatureAlgorithm = "${sse.signature.algorithm}";
-        public static final String keystorePath = "${sse.keystore.path}";
-        public static final String alias = "${sse.keystore.alias}";
-        public static final String password = "${sse.keystore.password}";
-        public static final String keystoreType = "{ sse.keystore.type}";
+        public static final String SSE_SIGNATURE_ALGORITHM = "${sse.signature.algorithm}";
+        public static final String KEYSTORE_PATH = "${sse.keystore.path}";
+        public static final String ALIAS = "${sse.keystore.alias}";
+        public static final String PASSWORD = "${sse.keystore.password}";
+        public static final String KEYSTORE_TYPE = "${sse.keystore.type}";
     }
 
     public static class Data {
@@ -73,10 +73,15 @@ public class Constants {
         //TODO move to applications.properties - add comment that it should be added to deployment.toml
         public static final List<String> EVENTS_SUPPORTED = Arrays.asList("POST_UPDATE_CREDENTIAL_BY_ADMIN",
                 "POST_UPDATE_CREDENTIAL");
+        public static final String ISS = "https://idp.sse.com/sse-issuer";
+        public static final List<String> AUD = Arrays.asList("https://idp.sse.com/sse-aud");
     }
 
     public static final String CLIENT_ID = "client_id";
+    public static final String FORMAT = "format";
     public static final String TOKEN = "token";
+    public static final String EMAIL = "email";
+    public static final String JTI = "jti";
     public static final String RS256 = "RS256";
     public static final String SHA512_WITH_HMAC = "SHA512_WITH_HMAC";
 }
