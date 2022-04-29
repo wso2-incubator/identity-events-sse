@@ -146,6 +146,8 @@ public class StreamController {
             config.setId(id);
             config.setStatus(Constants.Data.DEFAULT_STATUS);
             config.setEventsSupported(Constants.Data.EVENTS_SUPPORTED);
+            config.setAud(Constants.Data.AUD);
+            config.setIss(Constants.Data.ISS);
             config.setEventsDelivered(Arrays.asList());
             streamRepository.save(config);
             Stream createdStream = new Stream(config.getIss(), config.getAud(), config.getDelivery(),
@@ -275,8 +277,8 @@ public class StreamController {
     @PostMapping("subjects:remove")
     @ApiOperation(value = "", notes = "Add new subject to the stream")
     public ResponseEntity<?> removeSubject(@RequestBody Subject removeSubject,
-                                           @RequestHeader(value = AUTHORIZATION) String accessToken) throws
-            OIDCSSEException {
+                                           @RequestHeader(value = AUTHORIZATION) String accessToken)
+            throws OIDCSSEException {
 
         if (!validateAccessToken(accessToken)) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);

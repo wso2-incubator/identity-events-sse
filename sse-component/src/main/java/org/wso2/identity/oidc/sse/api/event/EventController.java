@@ -83,22 +83,20 @@ public class EventController {
                 event.getSubject());
         if (streams.isEmpty()) {
             if (log.isDebugEnabled()) {
-                log.debug("There are no streams subscribed to event:" + event.getName() + "of subject:"
-                        + event.getSubject());
+                log.debug("There are no streams subscribed to event:" + event.getName() + "of subject:" +
+                        event.getSubject());
             }
         } else {
             MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
             for (Stream stream : streams) {
-                List<String> aud = stream.getAud();
-                String securityEventToken = new SETTokenBuilder.Builder().audience(aud).event(event).build();
+                String deliveryUrl = stream.getDelivery().getUrl();
+                String securityEventToken = new SETTokenBuilder.Builder().audience(stream.getAud())
+                        .event(event).build();
                 map.add(Constants.TOKEN, securityEventToken);
-                for (int i = 0; stream.getAud().size() > i; i++) {
-                    String uri = stream.getAud().get(i);
-                    RestTemplate restTemplate = new RestTemplate();
-                    restTemplate.postForObject(uri, map, String.class);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Session invalidated successfully for the audience: " + uri);
-                    }
+                RestTemplate restTemplate = new RestTemplate();
+                restTemplate.postForObject(deliveryUrl, map, String.class);
+                if (log.isDebugEnabled()) {
+                    log.debug("Session invalidated successfully for the audience: " + deliveryUrl);
                 }
             }
         }

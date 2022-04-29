@@ -209,6 +209,26 @@ public class Stream {
     }
 
     /**
+     * Set issuer of the token.
+     *
+     * @param iss issuer url.
+     */
+    public void setIss(String iss) {
+
+        this.iss = iss;
+    }
+
+    /**
+     * Set audience list of the stream.
+     *
+     * @param aud audience list.
+     */
+    public void setAud(List<String> aud) {
+
+        this.aud = aud;
+    }
+
+    /**
      * Get delivery method of the stream.
      *
      * @return delivery  object instance.

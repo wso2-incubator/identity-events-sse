@@ -47,6 +47,7 @@ import java.security.interfaces.RSAPrivateKey;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Utility methods for SET token builder implementation.
@@ -67,8 +68,13 @@ public class SSEUtil {
 
         long currentTimeInMillis = Calendar.getInstance().getTimeInMillis();
         Date iat = new Date(currentTimeInMillis);
+        JWTClaimsSet.Builder eventClaims = new JWTClaimsSet.Builder();
+        eventClaims.claim(Constants.FORMAT, Constants.EMAIL);
+        eventClaims.claim(Constants.EMAIL, event.getSubject());
         JWTClaimsSet.Builder jwtClaimsSetBuilder = new JWTClaimsSet.Builder();
-        jwtClaimsSetBuilder.issueTime(iat).subject(event.getSubject()).audience(audience).issuer(event.getIssuer());
+        UUID jit = UUID.randomUUID();
+        jwtClaimsSetBuilder.claim(Constants.JTI, jit.toString()).issueTime(iat).audience(audience).claim(event.getName()
+                , eventClaims).issuer(event.getIssuer());
         return jwtClaimsSetBuilder.build();
     }
 
