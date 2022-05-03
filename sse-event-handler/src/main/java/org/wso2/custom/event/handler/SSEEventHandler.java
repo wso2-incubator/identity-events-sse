@@ -18,8 +18,6 @@
  *
  */
 
-//TODO chang custom to sse
-
 package org.wso2.custom.event.handler;
 
 import org.apache.axis2.transport.http.HTTPConstants;
@@ -77,7 +75,7 @@ public class SSEEventHandler extends AbstractEventHandler {
         StringEntity requestString;
         try {
             requestString = new StringEntity(requestObject.toString());
-            //TODO change to name value pair - later
+            //TODO change to name value pair
             httpPost.setEntity(requestString);
             httpPost.setHeader(HTTPConstants.HEADER_ACCEPT, HTTPConstants.MEDIA_TYPE_APPLICATION_JSON);
             httpPost.setHeader(HTTPConstants.HEADER_CONTENT_TYPE, HTTPConstants.MEDIA_TYPE_APPLICATION_JSON);

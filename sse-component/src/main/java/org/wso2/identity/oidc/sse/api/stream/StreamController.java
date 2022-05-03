@@ -68,6 +68,9 @@ public class StreamController {
     @Value(Constants.Introspection.CLIENT_SECRET)
     String password;
 
+    @Value(Constants.Data.EVENTS_SUPPORTED)
+    String[] EVENTS_SUPPORTED;
+
     private final StreamRepository streamRepository;
 
     public StreamController(StreamRepository streamRepository) {
@@ -145,7 +148,7 @@ public class StreamController {
         try {
             config.setId(id);
             config.setStatus(Constants.Data.DEFAULT_STATUS);
-            config.setEventsSupported(Constants.Data.EVENTS_SUPPORTED);
+            config.setEventsSupported(Arrays.asList(EVENTS_SUPPORTED));
             config.setAud(Constants.Data.AUD);
             config.setIss(Constants.Data.ISS);
             config.setEventsDelivered(Arrays.asList());

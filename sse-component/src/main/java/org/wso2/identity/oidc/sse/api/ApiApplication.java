@@ -51,7 +51,7 @@ public class ApiApplication {
 
     private ApiInfo apiInfo() {
 
-        //TODO add to properties file - later
+        //TODO add to properties file
         return new ApiInfoBuilder().title("Sample SSE API").version("1.0.0").build();
     }
 }
