@@ -70,6 +70,7 @@ public class Constants {
     public static class Data {
 
         public static final String DEFAULT_STATUS = "enabled";
+        //TODO map events to sse format
         public static final String EVENTS_SUPPORTED = "${sse.supported.events}";
         public static final String ISS = "https://idp.sse.com/sse-issuer";
         public static final List<String> AUD = Arrays.asList("https://idp.sse.com/sse-aud");
